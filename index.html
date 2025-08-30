@@ -1,4 +1,55 @@
-<!DOCTYPE html>
+<script>
+(() => {
+  // Path logic
+  function basePath(){
+    const p = location.pathname;
+    return p.endsWith('/') ? p : p.replace(/[^\/]+$/, '');
+  }
+  const BASE = basePath();
+  const HERO_SRC = BASE + "intro.jpg";
+
+  const hero = document.getElementById('hero');
+  const heroNext = document.getElementById('heroNext');
+
+  // preload & set hero
+  function preload(src){
+    return new Promise(res=>{
+      const im = new Image();
+      im.onload = () => res({ok:true,src});
+      im.onerror = () => res({ok:false,src});
+      im.src = src;
+    });
+  }
+
+  preload(HERO_SRC).then(r=>{
+    if(r.ok){
+      hero.src = HERO_SRC;
+      hero.alt = "Hero — Warrior Above the Burning City";
+    } else {
+      console.warn("⚠️ intro.jpg missing from folder.");
+      hero.alt = "⚠️ Missing Hero Image (intro.jpg)";
+    }
+  });
+
+  // optional crossfade helper if you swap hero later
+  function crossfadeHero(nextSrc, nextAlt=""){
+    heroNext.src = nextSrc;
+    heroNext.alt = nextAlt;
+    hero.classList.add('fade-out');
+    heroNext.classList.add('fade-in');
+    setTimeout(()=>{
+      hero.src = nextSrc;
+      hero.alt = nextAlt;
+      hero.classList.remove('fade-out');
+      heroNext.classList.remove('fade-in');
+      heroNext.src = "";
+    }, 900);
+  }
+
+  // expose crossfadeHero globally if needed
+  window.crossfadeHero = crossfadeHero;
+})();
+</script><!DOCTYPE html>
 <html lang="en">
 <head> 
   <meta charset="utf-8" />
